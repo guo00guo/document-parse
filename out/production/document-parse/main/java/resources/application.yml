@@ -1,0 +1,32 @@
+server.port: 8080
+spring.profiles.active: dev
+spring:
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+  http:
+    multipart:
+#      max-file-size: 300MB
+#      max-request-size: 300MB
+      encoding:
+        force: true
+        charset: utf-8
+        enabled: true
+sleep: 0
+
+ #配置输出日志
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
+
+---
+spring:
+  profiles: dev
+
+---
+spring:
+  profiles: online
