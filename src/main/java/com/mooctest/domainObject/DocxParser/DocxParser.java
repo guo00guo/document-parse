@@ -445,7 +445,7 @@ public class DocxParser implements Serializable {
         if (this.pictureNames.contains(pictureData.toString())) return;
 
         DocxPicture docxPicture = new DocxPicture();
-        docxPicture.setParagraphID(paragraphID);
+        docxPicture.setParagraphID(paragraphID-1);
         docxPicture.setIndex(this.picture_index++);
         docxPicture.setFileName(pictureData.getFileName());
         docxPicture.setSuggestFileExtension(pictureData.suggestFileExtension());

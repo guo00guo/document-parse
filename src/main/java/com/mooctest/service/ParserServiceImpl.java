@@ -101,16 +101,13 @@ public class ParserServiceImpl implements ParserService {
     @Override
     public List<SuperParagraph> getAllParaByTitleId(String token, Long paraId){
         WordParser wordParser = getResultBean(token);
-
-//        // 检验段落ID是否在文档段落的所属范围内
-//        checkParaIdInAllParas(wordParser, paraId);
-
         List<SuperParagraph> allHeads = wordParser.getAllHeads();
         // 检验标题ID是否在文档标题的所属范围内
-        checkParaIdInAllTitles(allHeads, paraId);
-        int curTitleID = allHeads.get((int) (paraId - 1)).getParagraphID();
+        int titleId = checkParaIdInAllTitles(wordParser, paraId);
+
+        int curTitleID = allHeads.get(titleId - 1).getParagraphID();
         // 判断是否存在后一个标题
-        int nextTitleID = getNextTitleId(wordParser, allHeads, paraId);
+        int nextTitleID = getNextTitleId(wordParser, allHeads, titleId);
         System.out.println("标题所在段落ID区间：" + curTitleID + "  " + nextTitleID);
 
         // 判断是否为最后一个标题
@@ -126,10 +123,11 @@ public class ParserServiceImpl implements ParserService {
         WordParser wordParser = getResultBean(token);
         List<SuperParagraph> allHeads = wordParser.getAllHeads();
         // 检验标题ID是否在文档标题的所属范围内
-        checkParaIdInAllTitles(allHeads, paraId);
-        int curTitleID = allHeads.get((int) (paraId - 1)).getParagraphID();
+        int titleId = checkParaIdInAllTitles(wordParser, paraId);
+
+        int curTitleID = allHeads.get(titleId - 1).getParagraphID();
         // 判断是否存在后一个标题
-        int nextTitleID = getNextTitleId(wordParser, allHeads, paraId);
+        int nextTitleID = getNextTitleId(wordParser, allHeads, titleId);
         System.out.println("标题所在段落ID区间：" + curTitleID + "  " + nextTitleID);
 
         // 判断是否为最后一个标题
@@ -146,10 +144,11 @@ public class ParserServiceImpl implements ParserService {
         List<SuperParagraph> allHeads = wordParser.getAllHeads();
 
         // 检验标题ID是否在文档标题的所属范围内
-        checkParaIdInAllTitles(allHeads, paraId);
-        int curTitleID = allHeads.get((int) (paraId - 1)).getParagraphID();
+        int titleId = checkParaIdInAllTitles(wordParser, paraId);
+
+        int curTitleID = allHeads.get(titleId - 1).getParagraphID();
         // 判断是否存在后一个标题
-        int nextTitleID = getNextTitleId(wordParser, allHeads, paraId);
+        int nextTitleID = getNextTitleId(wordParser, allHeads, titleId);
         System.out.println("标题所在段落ID区间：" + curTitleID + "  " + nextTitleID);
 
         List<SuperTable> tables = wordParser.getAllTables();
@@ -187,9 +186,30 @@ public class ParserServiceImpl implements ParserService {
         return null;
     }
 
-    private void checkParaIdInAllTitles(List<SuperParagraph> allHeads, Long paraId) {
-        if(paraId > allHeads.size() || paraId < 1){
-            throw new HttpBadRequestException("标题的ID"+ paraId +"不在文档标题的所属范围内，应保证在1~" + allHeads.size() + "之间");
+    private int checkParaIdInAllTitles(WordParser wordParser, Long paraId) {
+        // 获取所有段落
+        List<SuperParagraph> allParagraphs = wordParser.getAllParagraphs();
+        if(paraId > allParagraphs.size() || paraId <= 0){
+            throw new HttpBadRequestException("段落（标题）ID "+ paraId +" 不在文档段落的所属范围内，应保证在1~" + allParagraphs.size() + "之间");
+        }
+
+        // 获取所有标题
+        List<SuperParagraph> allHeads = wordParser.getAllHeads();
+        boolean flag = false;
+        int index = 1;
+        for(SuperParagraph paragraph : allHeads){
+            if(paragraph.getParagraphID() == Math.toIntExact(paraId)){
+                flag = true;
+                break;
+            }
+            index++;
+        }
+
+        // 判断是否属于标题
+        if(flag){
+            return index;
+        }else{
+            throw new HttpBadRequestException("段落ID "+ paraId +" 不属于标题");
         }
     }
 
@@ -201,13 +221,13 @@ public class ParserServiceImpl implements ParserService {
     }
 
 
-    private int getNextTitleId(WordParser wordParser, List<SuperParagraph> allHeads, Long paraId){
+    private int getNextTitleId(WordParser wordParser, List<SuperParagraph> allHeads, int paraId){
         // 判断是否存在后一个标题
         if (paraId >= allHeads.size()){
             // 已经是最后一个标题，则返回最后一个段落的id
             return wordParser.getAllParagraphs().size() - 1;
         }else{
-            return allHeads.get(Math.toIntExact(paraId)).getParagraphID();
+            return allHeads.get(paraId).getParagraphID();
         }
     }
 
