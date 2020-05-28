@@ -1,9 +1,9 @@
-package main.java.com.mooctest.data.response;
+package com.mooctest.data.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import main.java.com.mooctest.exception.ServerException;
+import com.mooctest.exception.ServerException;
 
 
 @Data

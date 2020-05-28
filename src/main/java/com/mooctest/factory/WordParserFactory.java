@@ -1,6 +1,6 @@
-package main.java.com.mooctest.factory;
+package com.mooctest.factory;
 
-import main.java.com.mooctest.domainObject.WordParser;
+import com.mooctest.domainObject.WordParser;
 
 /**
  * @author guochao

@@ -1,22 +1,22 @@
-package main.java.com.mooctest.service;
+package com.mooctest.service;
 
 import com.google.gson.Gson;
-import main.java.com.mooctest.data.StyleWrapper;
-import main.java.com.mooctest.domainObject.DocParser.DocParagraph;
-import main.java.com.mooctest.domainObject.DocParser.DocParser;
-import main.java.com.mooctest.domainObject.DocParser.DocPicture;
-import main.java.com.mooctest.domainObject.DocParser.DocTable;
-import main.java.com.mooctest.domainObject.DocxParser.DocxParagraph;
-import main.java.com.mooctest.domainObject.DocxParser.DocxParser;
-import main.java.com.mooctest.domainObject.DocxParser.DocxPicture;
-import main.java.com.mooctest.domainObject.DocxParser.DocxTable;
-import main.java.com.mooctest.domainObject.PdfParser.PdfParagraph;
-import main.java.com.mooctest.domainObject.PdfParser.PdfParser;
-import main.java.com.mooctest.domainObject.PdfParser.PdfPicture;
-import main.java.com.mooctest.domainObject.PdfParser.PdfTable;
-import main.java.com.mooctest.domainObject.*;
+import com.mooctest.data.StyleWrapper;
+import com.mooctest.domainObject.DocParser.DocParagraph;
+import com.mooctest.domainObject.DocParser.DocParser;
+import com.mooctest.domainObject.DocParser.DocPicture;
+import com.mooctest.domainObject.DocParser.DocTable;
+import com.mooctest.domainObject.DocxParser.DocxParagraph;
+import com.mooctest.domainObject.DocxParser.DocxParser;
+import com.mooctest.domainObject.DocxParser.DocxPicture;
+import com.mooctest.domainObject.DocxParser.DocxTable;
+import com.mooctest.domainObject.PdfParser.PdfParagraph;
+import com.mooctest.domainObject.PdfParser.PdfParser;
+import com.mooctest.domainObject.PdfParser.PdfPicture;
+import com.mooctest.domainObject.PdfParser.PdfTable;
+import com.mooctest.domainObject.*;
 import lombok.extern.slf4j.Slf4j;
-import main.java.com.mooctest.exception.HttpBadRequestException;
+import com.mooctest.exception.HttpBadRequestException;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -101,6 +101,10 @@ public class ParserServiceImpl implements ParserService {
     @Override
     public List<SuperParagraph> getAllParaByTitleId(String token, Long paraId){
         WordParser wordParser = getResultBean(token);
+
+//        // 检验段落ID是否在文档段落的所属范围内
+//        checkParaIdInAllParas(wordParser, paraId);
+
         List<SuperParagraph> allHeads = wordParser.getAllHeads();
         // 检验标题ID是否在文档标题的所属范围内
         checkParaIdInAllTitles(allHeads, paraId);
@@ -188,6 +192,14 @@ public class ParserServiceImpl implements ParserService {
             throw new HttpBadRequestException("标题的ID"+ paraId +"不在文档标题的所属范围内，应保证在1~" + allHeads.size() + "之间");
         }
     }
+
+    private void checkParaIdInAllParas(WordParser wordParser, Long paraId) {
+        List<SuperParagraph> allParagraphs = wordParser.getAllParagraphs();
+        if(paraId > allParagraphs.size() || paraId < 1){
+            throw new HttpBadRequestException("标题(段落)的ID"+ paraId +"不在文档标题的所属范围内，应保证在1~" + allParagraphs.size() + "之间");
+        }
+    }
+
 
     private int getNextTitleId(WordParser wordParser, List<SuperParagraph> allHeads, Long paraId){
         // 判断是否存在后一个标题

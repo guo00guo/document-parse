@@ -1,8 +1,8 @@
-package main.java.com.mooctest.service;
+package com.mooctest.service;
 
 import com.google.gson.Gson;
-import main.java.com.mooctest.domainObject.WordParser;
-import main.java.com.mooctest.factory.WordParserFactory;
+import com.mooctest.domainObject.WordParser;
+import com.mooctest.factory.WordParserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;

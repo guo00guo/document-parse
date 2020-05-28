@@ -1,6 +1,6 @@
-package main.java.com.mooctest.domainObject.DocxParser;
+package com.mooctest.domainObject.DocxParser;
 
-import main.java.com.mooctest.domainObject.SuperParagraph;
+import com.mooctest.domainObject.SuperParagraph;
 import lombok.Data;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.UnderlinePatterns;

@@ -1,4 +1,4 @@
-package main.java.com.mooctest.utils;
+package com.mooctest.utils;
 
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;

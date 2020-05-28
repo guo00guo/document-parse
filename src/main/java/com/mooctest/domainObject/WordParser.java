@@ -1,9 +1,9 @@
-package main.java.com.mooctest.domainObject;
+package com.mooctest.domainObject;
 
 import lombok.Data;
-import main.java.com.mooctest.domainObject.DocParser.DocParser;
-import main.java.com.mooctest.domainObject.DocxParser.DocxParser;
-import main.java.com.mooctest.domainObject.PdfParser.PdfParser;
+import com.mooctest.domainObject.DocParser.DocParser;
+import com.mooctest.domainObject.DocxParser.DocxParser;
+import com.mooctest.domainObject.PdfParser.PdfParser;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 

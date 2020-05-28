@@ -1,4 +1,4 @@
-package main.java.com.mooctest.domainObject;
+package com.mooctest.domainObject;
 
 import lombok.Data;
 import org.apache.poi.xwpf.usermodel.UnderlinePatterns;

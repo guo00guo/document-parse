@@ -1,4 +1,4 @@
-package main.java.com.mooctest.data.enums;
+package com.mooctest.data.enums;
 
 /**
  * @author guochao

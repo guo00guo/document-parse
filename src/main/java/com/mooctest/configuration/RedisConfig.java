@@ -1,4 +1,4 @@
-package main.java.com.mooctest.configuration;
+package com.mooctest.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;

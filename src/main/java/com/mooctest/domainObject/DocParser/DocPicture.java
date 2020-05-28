@@ -1,7 +1,7 @@
-package main.java.com.mooctest.domainObject.DocParser;
+package com.mooctest.domainObject.DocParser;
 
-import main.java.com.mooctest.domainObject.SuperParagraph;
-import main.java.com.mooctest.domainObject.SuperPicture;
+import com.mooctest.domainObject.SuperParagraph;
+import com.mooctest.domainObject.SuperPicture;
 import lombok.Data;
 
 import java.io.Serializable;

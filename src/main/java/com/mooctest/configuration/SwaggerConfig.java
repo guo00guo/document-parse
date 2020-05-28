@@ -1,7 +1,6 @@
-package main.java.com.mooctest.configuration;
+package com.mooctest.configuration;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -18,9 +17,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @author guochao
  * @date 2020-05-08 19:50
  */
-@Configuration
 @EnableSwagger2
-@ComponentScan(basePackages = {"com.mooctest.controller"})
+@Configuration
 public class SwaggerConfig extends WebMvcConfigurationSupport {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

@@ -1,17 +1,20 @@
-package main.java.com.mooctest.controller;
+package com.mooctest.controller;
 
-import main.java.com.mooctest.data.response.ResponseVO;
-import main.java.com.mooctest.data.response.ServerCode;
-import main.java.com.mooctest.domainObject.*;
+import com.mooctest.data.response.ResponseVO;
+import com.mooctest.data.response.ServerCode;
+import com.mooctest.domainObject.*;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import main.java.com.mooctest.exception.HttpBadRequestException;
-import main.java.com.mooctest.service.ParserService;
+import com.mooctest.exception.HttpBadRequestException;
+import com.mooctest.service.ParserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,20 +34,30 @@ public class ParserController {
     @Autowired
     private ParserService parserService;
 
-    @RequestMapping(value = "/load_file", method = RequestMethod.POST)
-    @ApiOperation(value="上传并解析文档",notes="上传并解析文档，需参数", httpMethod = "POST")
+    @RequestMapping(value = "/load_file", method = RequestMethod.POST, headers = "content-type=multipart/form-data")
+    @ApiOperation(value = "上传并解析文档", notes = "上传并解析文档，需参数")
     @ResponseBody
-    public ResponseVO<Map<String, List<String>>> loadFile(@RequestPart(name = "file") MultipartFile[] uploadFileList) throws IOException {
+    public ResponseVO<Map<String, List<String>>> loadFile(@ApiParam(value = "上传的文件", required = true)
+                                               @RequestParam(value = "uploadFileList", required = true) MultipartFile uploadFileList) throws IOException {
         Map<String, List<String>> map = new HashMap<>();
         List<String> tokenList = new ArrayList<>();
-        if(uploadFileList != null && uploadFileList.length > 0){
-            for(MultipartFile uploadFile : uploadFileList){
-                String token = parserService.parserFile(uploadFile);
-                tokenList.add(token);
-            }
+//        if(uploadFileList != null && uploadFileList.length > 0){
+//            for(MultipartFile uploadFile : uploadFileList){
+//                String token = parserService.parserFile(uploadFile);
+//                tokenList.add(token);
+//            }
+//        }else{
+//            System.out.println("No file is uploaded!");
+//            throw new HttpBadRequestException("No file is uploaded!");
+//        }
+        if(uploadFileList != null){
+            String token = parserService.parserFile(uploadFileList);
+            tokenList.add(token);
         }else{
+            System.out.println("No file is uploaded!");
             throw new HttpBadRequestException("No file is uploaded!");
         }
+
         map.put("token", tokenList);
 //        log.info("上传并解析文档,token：{}",map.toString());
         return new ResponseVO<>(ServerCode.SUCCESS,map);

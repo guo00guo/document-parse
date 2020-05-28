@@ -1,4 +1,4 @@
-package main.java.com.mooctest.service;
+package com.mooctest.service;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;

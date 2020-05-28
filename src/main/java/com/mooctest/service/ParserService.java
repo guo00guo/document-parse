@@ -1,6 +1,6 @@
-package main.java.com.mooctest.service;
+package com.mooctest.service;
 
-import main.java.com.mooctest.domainObject.*;
+import com.mooctest.domainObject.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

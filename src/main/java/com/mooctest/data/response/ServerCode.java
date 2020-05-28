@@ -1,4 +1,4 @@
-package main.java.com.mooctest.data.response;
+package com.mooctest.data.response;
 
 /**
  * Created on 2018/10/9

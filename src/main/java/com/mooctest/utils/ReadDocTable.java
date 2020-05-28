@@ -1,4 +1,4 @@
-package main.java.com.mooctest.utils;//package com.mooctest.utils;
+package com.mooctest.utils;//package com.mooctest.utils;
 //
 //import org.apache.pdfbox.pdmodel.PDDocument;
 //import org.apache.pdfbox.text.PDFTextStripper;

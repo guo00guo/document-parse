@@ -1,4 +1,4 @@
-package main.java.com.mooctest.configuration;
+package com.mooctest.configuration;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;

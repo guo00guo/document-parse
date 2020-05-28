@@ -1,13 +1,13 @@
-package main.java.com.mooctest.domainObject.DocxParser;
+package com.mooctest.domainObject.DocxParser;
 
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.google.common.collect.Lists;
 import com.microsoft.schemas.vml.CTShape;
-import main.java.com.mooctest.domainObject.SuperParagraph;
-import main.java.com.mooctest.domainObject.SuperPicture;
-import main.java.com.mooctest.domainObject.SuperTable;
+import com.mooctest.domainObject.SuperParagraph;
+import com.mooctest.domainObject.SuperPicture;
+import com.mooctest.domainObject.SuperTable;
 import lombok.Data;
-import main.java.com.mooctest.utils.ReadWordTable;
+import com.mooctest.utils.ReadWordTable;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
@@ -218,9 +218,13 @@ public class DocxParser implements Serializable {
                     // 当存在合并的单元格时，获取合并的行列数
                     if (colspan > 1) { // 合并的列
                         docxParagraph.setColspan(colspan);
+                    }else{
+                        docxParagraph.setColspan(1);
                     }
                     if (rowspan > 1) { // 合并的行
                         docxParagraph.setRowspan(rowspan);
+                    }else{
+                        docxParagraph.setRowspan(1);
                     }
                     paragraphsCell.add(docxParagraph);
 

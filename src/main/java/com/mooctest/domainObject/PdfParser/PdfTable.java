@@ -1,6 +1,6 @@
-package main.java.com.mooctest.domainObject.PdfParser;
+package com.mooctest.domainObject.PdfParser;
 
-import main.java.com.mooctest.domainObject.SuperTable;
+import com.mooctest.domainObject.SuperTable;
 import lombok.Data;
 
 import java.io.Serializable;

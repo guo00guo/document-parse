@@ -7,8 +7,6 @@ spring:
       max-request-size: 1000MB
   http:
     multipart:
-#      max-file-size: 300MB
-#      max-request-size: 300MB
       encoding:
         force: true
         charset: utf-8

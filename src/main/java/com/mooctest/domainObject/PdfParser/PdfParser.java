@@ -1,10 +1,10 @@
-package main.java.com.mooctest.domainObject.PdfParser;
+package com.mooctest.domainObject.PdfParser;
 
 
 import com.google.common.collect.Lists;
-import main.java.com.mooctest.domainObject.SuperParagraph;
-import main.java.com.mooctest.domainObject.SuperPicture;
-import main.java.com.mooctest.domainObject.SuperTable;
+import com.mooctest.domainObject.SuperParagraph;
+import com.mooctest.domainObject.SuperPicture;
+import com.mooctest.domainObject.SuperTable;
 import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.pdfbox.cos.COSName;

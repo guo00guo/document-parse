@@ -1,6 +1,6 @@
-package main.java.com.mooctest.domainObject.PdfParser;
+package com.mooctest.domainObject.PdfParser;
 
-import main.java.com.mooctest.domainObject.SuperParagraph;
+import com.mooctest.domainObject.SuperParagraph;
 import lombok.Data;
 
 import java.io.Serializable;

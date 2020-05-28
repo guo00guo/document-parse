@@ -1,8 +1,8 @@
-package main.java.com.mooctest.data;
+package com.mooctest.data;
 
-import main.java.com.mooctest.domainObject.SuperFontStyle;
-import main.java.com.mooctest.domainObject.SuperParagraph;
-import main.java.com.mooctest.domainObject.SuperParagraphStyle;
+import com.mooctest.domainObject.SuperFontStyle;
+import com.mooctest.domainObject.SuperParagraph;
+import com.mooctest.domainObject.SuperParagraphStyle;
 import org.springframework.beans.BeanUtils;
 
 /**

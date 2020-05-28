@@ -1,6 +1,6 @@
-package main.java.com.mooctest.domainObject.DocParser;
+package com.mooctest.domainObject.DocParser;
 
-import main.java.com.mooctest.domainObject.SuperTable;
+import com.mooctest.domainObject.SuperTable;
 import lombok.Data;
 
 import java.io.Serializable;
