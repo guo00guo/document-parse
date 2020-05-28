@@ -35,7 +35,7 @@ public class ParserController {
     private ParserService parserService;
 
     @RequestMapping(value = "/load_file", method = RequestMethod.POST, headers = "content-type=multipart/form-data")
-    @ApiOperation(value = "上传并解析文档", notes = "上传并解析文档，需参数")
+    @ApiOperation(value = "上传并解析文档", notes = "上传并解析文档，需参数，可使用fileTemp中的《文档解析模板V0.3》")
     @ResponseBody
     public ResponseVO<Map<String, List<String>>> loadFile(@ApiParam(value = "上传的文件", required = true)
                                                @RequestParam(value = "uploadFileList", required = true) MultipartFile uploadFileList) throws IOException {
@@ -64,7 +64,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/all_paragraphs", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档的所有段落信息",notes="获取文档的所有段落信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档的所有段落信息",notes="获取文档的所有段落信息，需获得的token作为参数", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperParagraph>> getAllPara(@PathVariable(name = "token") String token){
 //        log.info("获取文档的所有段落信息,token：{}",token);
@@ -72,7 +72,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/all_pics", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档的所有图片信息",notes="获取文档的所有图片信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档的所有图片信息",notes="获取文档的所有图片信息，需获得的token作为参数", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperPicture>> getAllPic(@PathVariable(name = "token") String token) {
 //        log.info("获取文档的所有图片信息,token：{}",token);
@@ -80,7 +80,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/all_tables", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档的所有表格信息",notes="获取文档的所有表格信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档的所有表格信息",notes="获取文档的所有表格信息，需获得的token作为参数", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperTable>> getAllTable(@PathVariable(name = "token") String token) {
 //        log.info("获取文档的所有表格信息,token：{}",token);
@@ -88,7 +88,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/all_titles", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档的所有标题信息",notes="获取文档的所有标题信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档的所有标题信息",notes="获取文档的所有标题信息，需获得的token作为参数", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperParagraph>> getAllTitle(@PathVariable(name = "token") String token) {
 //        log.info("获取文档的所有标题信息,token：{}",token);
@@ -102,7 +102,7 @@ public class ParserController {
      * @return
      */
     @RequestMapping(value = "/{token}/paragraph/{paragraph_id}", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档指定段落的段落信息",notes="获取文档指定标题下的所有段落信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档指定段落的段落信息",notes="获取文档指定标题下的所有段落信息，需获得的token作为参数，paragraph_id可使用5", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<SuperParagraph> getParaInfoByParaId(@PathVariable(name = "token") String token, @PathVariable("paragraph_id") Long paraId) {
 //        log.info("文档指定段落的段落信息,token：{}, paragraphId:{}",token, paraId);
@@ -110,7 +110,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/paragraph/{paragraph_id}/paragraph_style", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档指定段落的段落格式信息",notes="获取文档指定段落的段落格式信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档指定段落的段落格式信息",notes="获取文档指定段落的段落格式信息，需获得的token作为参数，paragraph_id可使用5", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<SuperParagraphStyle> getParaStyleByParaId(@PathVariable(name = "token") String token, @PathVariable("paragraph_id") Long paraId) {
 //        log.info("文档指定段落的段落格式信息,token：{}, paragraphId:{}",token, paraId);
@@ -118,7 +118,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/paragraph/{paragraph_id}/font_style", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档指定段落的字体格式信息",notes="获取文档指定段落的字体格式信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档指定段落的字体格式信息",notes="获取文档指定段落的字体格式信息，需获得的token作为参数，paragraph_id可使用5", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<SuperFontStyle> getFontStyleByParaId(@PathVariable(name = "token") String token, @PathVariable("paragraph_id") Long paraId) {
 //        log.info("文档指定段落的字体格式信息,token：{}, paragraphId:{}",token, paraId);
@@ -132,7 +132,7 @@ public class ParserController {
      * @return
      */
     @RequestMapping(value = "/{token}/title/{paragraph_id}/all_paragraphs", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档指定标题下的所有段落信息",notes="获取文档指定标题下的所有段落信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档指定标题下的所有段落信息",notes="获取文档指定标题下的所有段落信息，需获得的token作为参数，paragraph_id可使用54", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperParagraph>> getAllParaByTitleId(@PathVariable(name = "token") String token, @PathVariable("paragraph_id") Long paraId) {
 //        log.info("获取文档指定标题下的所有段落信息,token：{}, titleId:{}",token, paraId);
@@ -140,7 +140,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/title/{paragraph_id}/all_pics", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档指定标题下的所有图片信息",notes="获取文档指定标题下的所有图片信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档指定标题下的所有图片信息",notes="获取文档指定标题下的所有图片信息，需获得的token作为参数，paragraph_id可使用71", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperPicture>> getAllPictureByTitleId(@PathVariable(name = "token") String token, @PathVariable("paragraph_id") Long paraId) {
 //        log.info("获取文档指定标题下的所有图片信息,token：{}, titleId:{}",token, paraId);
@@ -148,7 +148,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}/title/{paragraph_id}/all_table", method = RequestMethod.GET)
-    @ApiOperation(value="获取文档指定标题下的所有表格信息",notes="获取文档指定标题下的所有表格信息，需参数", httpMethod = "GET")
+    @ApiOperation(value="获取文档指定标题下的所有表格信息",notes="获取文档指定标题下的所有表格信息，需获得的token作为参数，paragraph_id可使用195", httpMethod = "GET")
     @ResponseBody
     public ResponseVO<List<SuperTable>> getAllTableByTitleId(@PathVariable(name = "token") String token, @PathVariable("paragraph_id") Long paraId) {
 //        log.info("获取文档指定标题下的所有表格信息,token：{}, titleId:{}",token, paraId);
@@ -156,7 +156,7 @@ public class ParserController {
     }
 
     @RequestMapping(value = "/{token}", method = RequestMethod.DELETE)
-    @ApiOperation(value="释放服务端资源",notes="释放服务端资源，需参数", httpMethod = "DELETE")
+    @ApiOperation(value="释放服务端资源",notes="释放服务端资源，需获得的token作为参数", httpMethod = "DELETE")
     @ResponseBody
     public ResponseVO<String> deleteParserTaskByToken(@PathVariable(name = "token") String token) {
 //        log.info("释放服务端资源,token：{}",token);
