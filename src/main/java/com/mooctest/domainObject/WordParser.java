@@ -1,10 +1,12 @@
 package com.mooctest.domainObject;
 
 import com.mooctest.exception.HttpBadRequestException;
+import com.oracle.tools.packager.Log;
 import lombok.Data;
 import com.mooctest.domainObject.DocParser.DocParser;
 import com.mooctest.domainObject.DocxParser.DocxParser;
 import com.mooctest.domainObject.PdfParser.PdfParser;
+import org.apache.poi.hwpf.HWPFDocument;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,6 +86,7 @@ public class WordParser implements Serializable {
         String absolutePath = System.getProperty("user.dir");
         String path = absolutePath + "/fileTemp/";
         File destFile = new File(path, fileName);
+
         // 将MultipartFile存到临时文件中
         uploadFile.transferTo(destFile);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(destFile));
@@ -92,6 +95,24 @@ public class WordParser implements Serializable {
         this.setFile(destFile);
         String fileLowerName = fileName.toLowerCase();
         if (fileLowerName.endsWith(".doc")) {
+            // 如果是通过docx直接改名成doc，则依然是docx文档
+            try {
+                new HWPFDocument(new FileInputStream(this.file));
+            }catch (IllegalArgumentException exc){
+                try {
+                    docxParser = new DocxParser(this.getFile());
+                    this.setExt(".docx");
+                    this.setFileType(".docx");
+                    deleteFile(destFile);
+                    return this;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    deleteFile(destFile);
+                    return null;
+                }
+            }
+
+            // doc文档
             try {
                 docParser = new DocParser(this.getFile());
                 this.setExt(".doc");

@@ -3,6 +3,7 @@ package com.mooctest.domainObject.DocParser;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
 import com.mooctest.data.enums.JustificationEnum;
+import com.mooctest.domainObject.DocxParser.DocxParser;
 import com.mooctest.domainObject.SuperParagraph;
 import com.mooctest.domainObject.SuperPicture;
 import com.mooctest.domainObject.SuperTable;
