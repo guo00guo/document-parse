@@ -1,5 +1,6 @@
 package com.mooctest.domainObject;
 
+import com.mooctest.exception.HttpBadRequestException;
 import lombok.Data;
 import com.mooctest.domainObject.DocParser.DocParser;
 import com.mooctest.domainObject.DocxParser.DocxParser;
@@ -139,8 +140,9 @@ public class WordParser implements Serializable {
                 deleteFile(destFile);
                 return null;
             }
+        }else{
+            throw new HttpBadRequestException("暂不支持此类文件的解析，请上传doc、docx、pdf类型的文件！");
         }
-        return null;
     }
 
     private void deleteFile(File file){
