@@ -9,6 +9,8 @@ import com.mooctest.domainObject.SuperTable;
 import lombok.Data;
 import com.mooctest.utils.ReadWordTable;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.poi.hwpf.usermodel.Paragraph;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -26,7 +28,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +50,9 @@ public class DocxParser implements Serializable {
     private transient String eastAsiaFontName = "";
     private List<String> pictureNames = new ArrayList<String>();
     private transient boolean errorWord = false;
+
+    private transient int indent = 210;
+    private transient int firstLineIndex = 240;
 
 
 
@@ -73,7 +80,9 @@ public class DocxParser implements Serializable {
 
     private void processDefaultValue() {
         XWPFDefaultRunStyle xwpfDefaultRunStyle = this.document.getStyles().getDefaultRunStyle();
-//        if (xwpfDefaultRunStyle.getRPr().getRFonts().getEastAsia() != null) {
+
+
+//        if (XWPFDefaultRunStyle.getRPr().getRFonts().getEastAsia() != null) {
 //            this.setEastAsiaFontName(xwpfDefaultRunStyle.getRPr().getRFonts().getEastAsia());
 //        } else {
 //            this.setEastAsiaFontName("");
@@ -247,19 +256,54 @@ public class DocxParser implements Serializable {
     private DocxParagraph processParagraph(XWPFParagraph paragraph, int index) {
         //解析段落信息
         DocxParagraph docxParagraph = new DocxParagraph();
-        docxParagraph.setFirstLineIndent(paragraph.getFirstLineIndent());
-        docxParagraph.setFontAlignment(paragraph.getAlignment());
-        docxParagraph.setIndentFromLeft(paragraph.getIndentFromLeft());
-        docxParagraph.setIndentFromRight(paragraph.getIndentFromRight());
+
+        // 设置文本之前缩进
+        if(paragraph.getIndentFromLeft() == -1){
+            docxParagraph.setIndentBeforeText(0);
+        }else{
+            docxParagraph.setIndentBeforeText(paragraph.getIndentFromLeft() * 1.0 / indent);
+        }
+
+        // 设置文本之后缩进
+        if(paragraph.getIndentFromRight() == -1){
+            docxParagraph.setIndentAfterText(0);
+        }else{
+            docxParagraph.setIndentAfterText(paragraph.getIndentFromRight() * 1.0 / indent);
+        }
+
+        // 设置首行缩进信息
+        if(paragraph.getFirstLineIndent() == -1){
+            docxParagraph.setFirstLineIndent(0);
+        }else{
+            if(docxParagraph.getIndentAfterText() == 0.0 && docxParagraph.getIndentBeforeText() == 0.0){
+                docxParagraph.setFirstLineIndent(paragraph.getFirstLineIndent() * 1.0 / indent);
+            }else{
+                docxParagraph.setFirstLineIndent(paragraph.getFirstLineIndent() * 1.0 / firstLineIndex);
+            }
+        }
+
+//        docxParagraph.setFontAlignment(paragraph.getFontAlignment());
         docxParagraph.setLvl(this.getLvl(paragraph));
         docxParagraph.setParagraphText(this.processText(paragraph));
-        docxParagraph.setLineSpacing(paragraph.getSpacingLineRule().getValue());
+        docxParagraph.setLineSpace(paragraph.getSpacingLineRule().getValue());
         docxParagraph.setParagraphID(index);
+
         docxParagraph.setAlignment(paragraph.getAlignment());
         docxParagraph.setNumFmt(paragraph.getNumFmt());
         docxParagraph.setNumIlvl(paragraph.getNumIlvl());
         docxParagraph.setNumLevelText(paragraph.getNumLevelText());
         docxParagraph.setNumId(paragraph.getNumID());
+        docxParagraph.setLineSpace(paragraph.getSpacingBetween());
+
+//        System.out.println(paragraph.getSpacingAfter());
+//        System.out.println(paragraph.getSpacingBefore());
+//        System.out.println(paragraph.getSpacingBetween());
+
+//        XWPFDefaultParagraphStyle defaultParagraphStyle = this.document.getStyles().getDefaultParagraphStyle();
+//        int spacingAfter = defaultParagraphStyle.getSpacingAfter();
+//        System.out.println(spacingAfter);
+
+//        System.out.println(index + "  " + docxParagraph.getIndentFromLeft() + "  " + docxParagraph.getIndentFromRight());
 
         //解析字体格式等
         String fontName = "";
@@ -271,8 +315,12 @@ public class DocxParser implements Serializable {
         boolean strike = false;
         UnderlinePatterns underline = UnderlinePatterns.NONE;
         List<XWPFRun> xwpfRuns = paragraph.getRuns();
+//        System.out.println("paragraph: " + docxParagraph.getParagraphText());
+
         for (int i = 0; i < xwpfRuns.size(); i++) {
             XWPFRun xwpfRun = xwpfRuns.get(i);
+//            System.out.println("text" + i + " : " + xwpfRun.getText(0));
+
             if (i == 0) {
                 fontSize = xwpfRun.getFontSize();
                 fontName = this.getFontFamily(xwpfRun); // getFontFamily() ，仅当运行的run属性中存在字体系列时，它才会返回字体系列。否则它将返回null
@@ -284,9 +332,20 @@ public class DocxParser implements Serializable {
                 strike = xwpfRun.isStrikeThrough();
                 underline = xwpfRun.getUnderline();
 //                strike = xwpfRun.isStrike();
+                if (fontSize == -1){
+                    fontSize = document.getStyles().getDefaultRunStyle().getFontSize();
+                    if(fontSize == -1)
+                        fontSize = 10;
+                }
             } else {
-                if (fontSize == -1 && fontName.equals("") && color.equals("")) break;
-                if (fontSize != xwpfRun.getFontSize()) fontSize = -1;
+                int fontSizeOther = xwpfRun.getFontSize();
+                if (fontSizeOther == -1){
+                    fontSizeOther = document.getStyles().getDefaultRunStyle().getFontSize();
+                    if(fontSizeOther == -1)
+                        fontSizeOther = 10;
+                }
+//                if (fontSizeOther == -1 && fontName.equals("") && color.equals("")) break;
+                if (fontSize != fontSizeOther) fontSize = -2;
                 if (!fontName.equals(this.getFontFamily(xwpfRun))) fontName = "";
                 if (!color.equals(this.getColor(xwpfRun))) color = "";
                 if (bold != xwpfRun.isBold()) bold = false;
@@ -295,12 +354,19 @@ public class DocxParser implements Serializable {
                 if (strike != xwpfRun.isStrikeThrough()) strike = false;
                 if (strike != xwpfRun.isStrike()) strike = false;
                 if (underline != xwpfRun.getUnderline()) underline = UnderlinePatterns.NONE;
-
+//                System.out.println("size " + i  + ": " + fontSize);
             }
 //            if(index <  100){
 //                System.out.println(index + "  " + i + "  " + xwpfRun.getText(0) + "  fontSize:"+ fontSize + "  fontName:"+ fontName + "  bold:" + bold);
 //            }
+
+//            System.out.println("fontSize: " + i + " " + fontSize);
+//            System.out.println("fontName: " + i + " " + fontName);
         }
+        if(fontSize == -1) {
+            fontSize = 10;
+        }
+//        System.out.println("all size : " + fontSize);
         docxParagraph.setFontName(fontName);
         docxParagraph.setFontSize(fontSize);
         docxParagraph.setColor(color);
@@ -493,27 +559,21 @@ public class DocxParser implements Serializable {
 
     public List<SuperParagraph> getAllParagraphs() {
         List<SuperParagraph> contextList = Lists.newArrayList();
-//        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-//        filter.getExcludes().add("XWPFParagraph");
-        for (DocxParagraph docParagraph : this.docxParagraphs) {
-//            System.out.println(docParagraph.toString());
-            contextList.add(docParagraph);
-        }
-        return contextList;
-    }
 
-    public List<SuperParagraph> getAllHeads() {
-        List<SuperParagraph> contextList = Lists.newArrayList();
-//        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-//        filter.getExcludes().add("XWPFParagraph");
-        int[] levelCurrentValues = new int[] {0,0,0,0};
+        Map<BigInteger, int[]> map = new HashMap<>();
+
         for (DocxParagraph paragraph : this.docxParagraphs) {
             if (paragraph.getLvl() < 9) {
                 contextList.add(paragraph);
                 continue;
             }
             //xwpf
-            if(paragraph.getNumFmt() != null){
+            if(paragraph.getNumId() != null){
+
+                if(!map.containsKey(paragraph.getNumId())){
+                    map.put(paragraph.getNumId(), new int[] {0,0,0,0});
+                }
+                int[] levelCurrentValues = map.get(paragraph.getNumId());
                 // 获取标题名称
                 String paragraphText = paragraph.getParagraphText();
                 String titleName = "";
@@ -533,12 +593,55 @@ public class DocxParser implements Serializable {
                     levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
                     paragraph.setParagraphText(levelText + titleName);
                 }
+                map.put(paragraph.getNumId(), levelCurrentValues);
+                contextList.add(paragraph);
+                continue;
+            }else{
+                contextList.add(paragraph);
+            }
+        }
+        return contextList;
+    }
+
+    public List<SuperParagraph> getAllHeads() {
+        List<SuperParagraph> contextList = Lists.newArrayList();
+        Map<BigInteger, int[]> map = new HashMap<>();
+
+        for (DocxParagraph paragraph : this.docxParagraphs) {
+            if (paragraph.getLvl() < 9) {
                 contextList.add(paragraph);
                 continue;
             }
-//            if(paragraph.getNumId() != null){
-//                contextList.add(paragraph);
-//            }
+            //xwpf
+            if(paragraph.getNumId() != null){
+
+                if(!map.containsKey(paragraph.getNumId())){
+                    map.put(paragraph.getNumId(), new int[] {0,0,0,0});
+                }
+                int[] levelCurrentValues = map.get(paragraph.getNumId());
+                // 获取标题名称
+                String paragraphText = paragraph.getParagraphText();
+                String titleName = "";
+                if(paragraphText.contains("decimal")){
+                    int index = paragraphText.lastIndexOf("decimal");
+                    titleName = paragraphText.substring(index+7, paragraphText.length());
+                }
+
+                // 获取标题编号
+                BigInteger levelDepth = paragraph.getNumIlvl();
+                String levelText = paragraph.getNumLevelText();
+                if(levelText!=null) {
+                    levelCurrentValues[levelDepth.intValue()] += 1;
+                    levelText = levelText.replace("%1", "" + levelCurrentValues[0]);
+                    levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
+                    levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
+                    levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
+                    paragraph.setParagraphText(levelText + titleName);
+                }
+                map.put(paragraph.getNumId(), levelCurrentValues);
+                contextList.add(paragraph);
+                continue;
+            }
         }
         return contextList;
     }

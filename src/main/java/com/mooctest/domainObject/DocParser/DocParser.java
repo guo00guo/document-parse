@@ -80,8 +80,8 @@ public class DocParser implements Serializable {
         DocParagraph docParagraph = new DocParagraph();
         docParagraph.setFirstLineIndent(paragraph.getFirstLineIndent());
         docParagraph.setFontAlignment(paragraph.getFontAlignment());
-        docParagraph.setIndentFromLeft(paragraph.getIndentFromLeft());
-        docParagraph.setIndentFromRight(paragraph.getIndentFromRight());
+        docParagraph.setIndentBeforeText(paragraph.getIndentFromLeft());
+        docParagraph.setIndentAfterText(paragraph.getIndentFromRight());
         docParagraph.setLvl(paragraph.getLvl());
         docParagraph.setLlvl(paragraph.getIlvl());
         docParagraph.setLinfo(paragraph.getIlfo());

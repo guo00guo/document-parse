@@ -24,9 +24,10 @@ public class DocxParagraph extends SuperParagraph implements Serializable {
     private UnderlinePatterns underline = UnderlinePatterns.NONE;   // 是否存在下划线
 //
 //    private boolean isInTable = false;
-    private int lineSpacing;
-    private ParagraphAlignment fontAlignment;  // 字体对齐方式：1左对齐 2居中 3右对齐
-//    private boolean isTableRowEnd = false;
+//    private int lineSpacing;
+//    private int fontAlignment;  // 字体对齐方式：1左对齐 2居中 3右对齐
+    private String justification;  // 0=left, 1=center, 2=right, 3=left and right
+    //    private boolean isTableRowEnd = false;
 //    private int paragraphID;
 //    private int indentFromLeft;
 //    private int indentFromRight;
@@ -44,23 +45,15 @@ public class DocxParagraph extends SuperParagraph implements Serializable {
 //    private BigInteger numId;     // 标题级别
 
 
-    public DocxParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, int indentFromLeft, int indentFromRight, int firstLineIndent, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, UnderlinePatterns underline, int lineSpacing, ParagraphAlignment fontAlignment, ParagraphAlignment alignment) {
-        super(paragraphText, lvl, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentFromLeft, indentFromRight, firstLineIndent, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
+    public DocxParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, UnderlinePatterns underline, String justification, ParagraphAlignment alignment) {
+        super(paragraphText, lvl, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentBeforeText, indentAfterText, firstLineIndent, lineSpace, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
         this.underline = underline;
-        this.lineSpacing = lineSpacing;
-        this.fontAlignment = fontAlignment;
+        this.justification = justification;
         this.alignment = alignment;
     }
 
-    public DocxParagraph(UnderlinePatterns underline, int lineSpacing, ParagraphAlignment fontAlignment, ParagraphAlignment alignment) {
-        this.underline = underline;
-        this.lineSpacing = lineSpacing;
-        this.fontAlignment = fontAlignment;
-        this.alignment = alignment;
-    }
+    public DocxParagraph(){
 
-    public DocxParagraph() {
-        super();
     }
 
     public UnderlinePatterns getUnderline() {
@@ -71,20 +64,12 @@ public class DocxParagraph extends SuperParagraph implements Serializable {
         this.underline = underline;
     }
 
-    public int getLineSpacing() {
-        return lineSpacing;
+    public String getJustification() {
+        return justification;
     }
 
-    public void setLineSpacing(int lineSpacing) {
-        this.lineSpacing = lineSpacing;
-    }
-
-    public ParagraphAlignment getFontAlignment() {
-        return fontAlignment;
-    }
-
-    public void setFontAlignment(ParagraphAlignment fontAlignment) {
-        this.fontAlignment = fontAlignment;
+    public void setJustification(String justification) {
+        this.justification = justification;
     }
 
     public ParagraphAlignment getAlignment() {

@@ -34,8 +34,8 @@ public class DocParagraph extends SuperParagraph implements Serializable {
 //    private XWPFParagraph xwpfParagraph = null;
 
 
-    public DocParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, int indentFromLeft, int indentFromRight, int firstLineIndent, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, int llvl, int linfo, String lineSpacing, int fontAlignment, int underline, String justification, boolean tableRowEnd) {
-        super(paragraphText, lvl, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentFromLeft, indentFromRight, firstLineIndent, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
+    public DocParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, int llvl, int linfo, String lineSpacing, int fontAlignment, int underline, String justification, boolean tableRowEnd) {
+        super(paragraphText, lvl, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentBeforeText, indentAfterText, firstLineIndent, lineSpace, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
         this.llvl = llvl;
         this.linfo = linfo;
         this.lineSpacing = lineSpacing;
@@ -56,7 +56,7 @@ public class DocParagraph extends SuperParagraph implements Serializable {
     }
 
     public DocParagraph() {
-        super();
+
     }
 
     public int getLlvl() {

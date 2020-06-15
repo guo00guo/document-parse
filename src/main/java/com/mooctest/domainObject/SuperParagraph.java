@@ -1,6 +1,7 @@
 package com.mooctest.domainObject;
 
 import lombok.Data;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -29,9 +30,10 @@ public class SuperParagraph implements Serializable {
 
     private boolean inTable = false;
     private int paragraphID;
-    private int indentFromLeft;
-    private int indentFromRight;
-    private int firstLineIndent;    // 首行缩进
+    private double indentBeforeText;    // 文本之前缩进
+    private double indentAfterText;     // 文本之后缩进
+    private double firstLineIndent;     // 首行缩进
+    private double lineSpace;           // 行距
     private String color = "000000";
 
     // 单元格合并信息
@@ -46,8 +48,7 @@ public class SuperParagraph implements Serializable {
 //    private ParagraphAlignment alignment = ParagraphAlignment.BOTH; // 段落对齐方式
 //    private UnderlinePatterns underline = UnderlinePatterns.NONE;   // 是否存在下划线
 
-
-    public SuperParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, int indentFromLeft, int indentFromRight, int firstLineIndent, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId) {
+    public SuperParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId) {
         this.paragraphText = paragraphText;
         this.lvl = lvl;
         this.fontSize = fontSize;
@@ -60,9 +61,10 @@ public class SuperParagraph implements Serializable {
         this.strike = strike;
         this.inTable = inTable;
         this.paragraphID = paragraphID;
-        this.indentFromLeft = indentFromLeft;
-        this.indentFromRight = indentFromRight;
+        this.indentBeforeText = indentBeforeText;
+        this.indentAfterText = indentAfterText;
         this.firstLineIndent = firstLineIndent;
+        this.lineSpace = lineSpace;
         this.color = color;
         this.rowspan = rowspan;
         this.colspan = colspan;
@@ -73,7 +75,6 @@ public class SuperParagraph implements Serializable {
     }
 
     public SuperParagraph() {
-
     }
 
     public String getParagraphText() {
@@ -172,28 +173,36 @@ public class SuperParagraph implements Serializable {
         this.paragraphID = paragraphID;
     }
 
-    public int getIndentFromLeft() {
-        return indentFromLeft;
+    public double getIndentBeforeText() {
+        return indentBeforeText;
     }
 
-    public void setIndentFromLeft(int indentFromLeft) {
-        this.indentFromLeft = indentFromLeft;
+    public void setIndentBeforeText(double indentBeforeText) {
+        this.indentBeforeText = indentBeforeText;
     }
 
-    public int getIndentFromRight() {
-        return indentFromRight;
+    public double getIndentAfterText() {
+        return indentAfterText;
     }
 
-    public void setIndentFromRight(int indentFromRight) {
-        this.indentFromRight = indentFromRight;
+    public void setIndentAfterText(double indentAfterText) {
+        this.indentAfterText = indentAfterText;
     }
 
-    public int getFirstLineIndent() {
+    public double getFirstLineIndent() {
         return firstLineIndent;
     }
 
-    public void setFirstLineIndent(int firstLineIndent) {
+    public void setFirstLineIndent(double firstLineIndent) {
         this.firstLineIndent = firstLineIndent;
+    }
+
+    public double getLineSpace() {
+        return lineSpace;
+    }
+
+    public void setLineSpace(double lineSpace) {
+        this.lineSpace = lineSpace;
     }
 
     public String getColor() {
