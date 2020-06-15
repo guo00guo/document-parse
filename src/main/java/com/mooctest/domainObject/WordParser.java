@@ -1,7 +1,6 @@
 package com.mooctest.domainObject;
 
 import com.mooctest.exception.HttpBadRequestException;
-import com.oracle.tools.packager.Log;
 import lombok.Data;
 import com.mooctest.domainObject.DocParser.DocParser;
 import com.mooctest.domainObject.DocxParser.DocxParser;
