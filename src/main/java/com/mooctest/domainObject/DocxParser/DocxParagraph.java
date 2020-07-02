@@ -45,8 +45,14 @@ public class DocxParagraph extends SuperParagraph implements Serializable {
 //    private BigInteger numId;     // 标题级别
 
 
-    public DocxParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, UnderlinePatterns underline, String justification, ParagraphAlignment alignment) {
-        super(paragraphText, lvl, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentBeforeText, indentAfterText, firstLineIndent, lineSpace, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
+    public DocxParagraph(String paragraphText, int lvl, int llvl, int linfo, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, UnderlinePatterns underline, String justification, ParagraphAlignment alignment) {
+        super(paragraphText, lvl, llvl, linfo, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentBeforeText, indentAfterText, firstLineIndent, lineSpace, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
+        this.underline = underline;
+        this.justification = justification;
+        this.alignment = alignment;
+    }
+
+    public DocxParagraph(UnderlinePatterns underline, String justification, ParagraphAlignment alignment) {
         this.underline = underline;
         this.justification = justification;
         this.alignment = alignment;

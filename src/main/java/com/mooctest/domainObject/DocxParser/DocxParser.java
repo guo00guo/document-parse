@@ -6,11 +6,9 @@ import com.microsoft.schemas.vml.CTShape;
 import com.mooctest.domainObject.SuperParagraph;
 import com.mooctest.domainObject.SuperPicture;
 import com.mooctest.domainObject.SuperTable;
-import lombok.Data;
 import com.mooctest.utils.ReadWordTable;
+import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.poi.hwpf.usermodel.Paragraph;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -261,14 +259,14 @@ public class DocxParser implements Serializable {
         if(paragraph.getIndentFromLeft() == -1){
             docxParagraph.setIndentBeforeText(0);
         }else{
-            docxParagraph.setIndentBeforeText(paragraph.getIndentFromLeft() * 1.0 / indent);
+            docxParagraph.setIndentBeforeText((double) Math.round(paragraph.getIndentFromLeft() * 1.0 / indent) / 100);
         }
 
         // 设置文本之后缩进
         if(paragraph.getIndentFromRight() == -1){
             docxParagraph.setIndentAfterText(0);
         }else{
-            docxParagraph.setIndentAfterText(paragraph.getIndentFromRight() * 1.0 / indent);
+            docxParagraph.setIndentAfterText((double) Math.round(paragraph.getIndentFromRight() * 1.0 / indent) / 100);
         }
 
         // 设置首行缩进信息
@@ -276,9 +274,9 @@ public class DocxParser implements Serializable {
             docxParagraph.setFirstLineIndent(0);
         }else{
             if(docxParagraph.getIndentAfterText() == 0.0 && docxParagraph.getIndentBeforeText() == 0.0){
-                docxParagraph.setFirstLineIndent(paragraph.getFirstLineIndent() * 1.0 / indent);
+                docxParagraph.setFirstLineIndent((double) Math.round(paragraph.getFirstLineIndent() * 1.0 / indent) / 100);
             }else{
-                docxParagraph.setFirstLineIndent(paragraph.getFirstLineIndent() * 1.0 / firstLineIndex);
+                docxParagraph.setFirstLineIndent((double) Math.round(paragraph.getFirstLineIndent() * 1.0 / firstLineIndex) / 100);
             }
         }
 
@@ -562,42 +560,79 @@ public class DocxParser implements Serializable {
 
         Map<BigInteger, int[]> map = new HashMap<>();
 
+        int firstNum = 0;
         for (DocxParagraph paragraph : this.docxParagraphs) {
             if (paragraph.getLvl() < 9) {
-                contextList.add(paragraph);
+                if(paragraph.getNumId() != null){
+
+                    if(!map.containsKey(paragraph.getNumId())){
+                        map.put(paragraph.getNumId(), new int[] {0,0,0,0});
+                    }
+                    int[] levelCurrentValues = map.get(paragraph.getNumId());
+                    // 获取标题名称
+                    String paragraphText = paragraph.getParagraphText();
+                    String titleName = "";
+                    if(paragraphText.contains("decimal")){
+                        int index = paragraphText.lastIndexOf("decimal");
+                        titleName = paragraphText.substring(index+7, paragraphText.length());
+                    }
+
+                    // 获取标题编号
+                    BigInteger levelDepth = paragraph.getNumIlvl();
+                    if(levelDepth.intValue() == 0){
+                        firstNum += 1;
+                    }
+                    String levelText = paragraph.getNumLevelText();
+                    if(levelText!=null) {
+                        levelCurrentValues[levelDepth.intValue()] += 1;
+                        levelText = levelText.replace("%1", "" + firstNum);
+                        levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
+                        levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
+                        levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
+                        paragraph.setParagraphText(levelText + titleName);
+                    }
+                    map.put(paragraph.getNumId(), levelCurrentValues);
+                    contextList.add(paragraph);
+                    continue;
+                }else{
+                    contextList.add(paragraph);
+                }
                 continue;
             }
             //xwpf
-            if(paragraph.getNumId() != null){
+            else{
+                if(paragraph.getNumId() != null) {
 
-                if(!map.containsKey(paragraph.getNumId())){
-                    map.put(paragraph.getNumId(), new int[] {0,0,0,0});
-                }
-                int[] levelCurrentValues = map.get(paragraph.getNumId());
-                // 获取标题名称
-                String paragraphText = paragraph.getParagraphText();
-                String titleName = "";
-                if(paragraphText.contains("decimal")){
-                    int index = paragraphText.lastIndexOf("decimal");
-                    titleName = paragraphText.substring(index+7, paragraphText.length());
-                }
+                    if (!map.containsKey(paragraph.getNumId())) {
+                        map.put(paragraph.getNumId(), new int[]{0, 0, 0, 0});
+                    }
+                    int[] levelCurrentValues = map.get(paragraph.getNumId());
+                    // 获取标题名称
+                    String paragraphText = paragraph.getParagraphText();
+                    String titleName = "";
+                    if (paragraphText.contains("decimal")) {
+                        int index = paragraphText.lastIndexOf("decimal");
+                        titleName = paragraphText.substring(index + 7, paragraphText.length());
+                    }
 
-                // 获取标题编号
-                BigInteger levelDepth = paragraph.getNumIlvl();
-                String levelText = paragraph.getNumLevelText();
-                if(levelText!=null) {
-                    levelCurrentValues[levelDepth.intValue()] += 1;
-                    levelText = levelText.replace("%1", "" + levelCurrentValues[0]);
-                    levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
-                    levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
-                    levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
-                    paragraph.setParagraphText(levelText + titleName);
+                    // 获取标题编号
+                    BigInteger levelDepth = paragraph.getNumIlvl();
+                    String levelText = paragraph.getNumLevelText();
+                    if (levelText != null) {
+                        levelCurrentValues[levelDepth.intValue()] += 1;
+                        levelText = levelText.replace("%1", "" + levelCurrentValues[0]);
+                        levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
+                        levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
+                        levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
+                        levelText = levelText.replaceFirst("0", "1");
+                        paragraph.setParagraphText(levelText + titleName);
+                    }
+                    map.put(paragraph.getNumId(), levelCurrentValues);
+                    contextList.add(paragraph);
+                    continue;
+                }else{
+                    contextList.add(paragraph);
                 }
-                map.put(paragraph.getNumId(), levelCurrentValues);
-                contextList.add(paragraph);
-                continue;
-            }else{
-                contextList.add(paragraph);
             }
         }
         return contextList;
@@ -607,40 +642,77 @@ public class DocxParser implements Serializable {
         List<SuperParagraph> contextList = Lists.newArrayList();
         Map<BigInteger, int[]> map = new HashMap<>();
 
+        int firstNum = 0;
         for (DocxParagraph paragraph : this.docxParagraphs) {
             if (paragraph.getLvl() < 9) {
-                contextList.add(paragraph);
+                if(paragraph.getNumId() != null){
+
+                    if(!map.containsKey(paragraph.getNumId())){
+                        map.put(paragraph.getNumId(), new int[] {0,0,0,0});
+                    }
+                    int[] levelCurrentValues = map.get(paragraph.getNumId());
+                    // 获取标题名称
+                    String paragraphText = paragraph.getParagraphText();
+                    String titleName = "";
+                    if(paragraphText.contains("decimal")){
+                        int index = paragraphText.lastIndexOf("decimal");
+                        titleName = paragraphText.substring(index+7, paragraphText.length());
+                    }
+
+                    // 获取标题编号
+                    BigInteger levelDepth = paragraph.getNumIlvl();
+                    if(levelDepth.intValue() == 0){
+                        firstNum += 1;
+                    }
+                    String levelText = paragraph.getNumLevelText();
+                    if(levelText!=null) {
+                        levelCurrentValues[levelDepth.intValue()] += 1;
+                        levelText = levelText.replace("%1", "" + firstNum);
+                        levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
+                        levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
+                        levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
+                        paragraph.setParagraphText(levelText + titleName);
+                    }
+                    map.put(paragraph.getNumId(), levelCurrentValues);
+                    contextList.add(paragraph);
+                    continue;
+                }else{
+                    contextList.add(paragraph);
+                }
                 continue;
             }
             //xwpf
-            if(paragraph.getNumId() != null){
+            else{
+                if(paragraph.getNumId() != null) {
 
-                if(!map.containsKey(paragraph.getNumId())){
-                    map.put(paragraph.getNumId(), new int[] {0,0,0,0});
-                }
-                int[] levelCurrentValues = map.get(paragraph.getNumId());
-                // 获取标题名称
-                String paragraphText = paragraph.getParagraphText();
-                String titleName = "";
-                if(paragraphText.contains("decimal")){
-                    int index = paragraphText.lastIndexOf("decimal");
-                    titleName = paragraphText.substring(index+7, paragraphText.length());
-                }
+                    if (!map.containsKey(paragraph.getNumId())) {
+                        map.put(paragraph.getNumId(), new int[]{0, 0, 0, 0});
+                    }
+                    int[] levelCurrentValues = map.get(paragraph.getNumId());
+                    // 获取标题名称
+                    String paragraphText = paragraph.getParagraphText();
+                    String titleName = "";
+                    if (paragraphText.contains("decimal")) {
+                        int index = paragraphText.lastIndexOf("decimal");
+                        titleName = paragraphText.substring(index + 7, paragraphText.length());
+                    }
 
-                // 获取标题编号
-                BigInteger levelDepth = paragraph.getNumIlvl();
-                String levelText = paragraph.getNumLevelText();
-                if(levelText!=null) {
-                    levelCurrentValues[levelDepth.intValue()] += 1;
-                    levelText = levelText.replace("%1", "" + levelCurrentValues[0]);
-                    levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
-                    levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
-                    levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
-                    paragraph.setParagraphText(levelText + titleName);
+                    // 获取标题编号
+                    BigInteger levelDepth = paragraph.getNumIlvl();
+                    String levelText = paragraph.getNumLevelText();
+                    if (levelText != null) {
+                        levelCurrentValues[levelDepth.intValue()] += 1;
+                        levelText = levelText.replace("%1", "" + levelCurrentValues[0]);
+                        levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
+                        levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
+                        levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
+                        levelText = levelText.replaceFirst("0", "1");
+                        paragraph.setParagraphText(levelText + titleName);
+                    }
+                    map.put(paragraph.getNumId(), levelCurrentValues);
+                    contextList.add(paragraph);
+                    continue;
                 }
-                map.put(paragraph.getNumId(), levelCurrentValues);
-                contextList.add(paragraph);
-                continue;
             }
         }
         return contextList;

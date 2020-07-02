@@ -4,13 +4,12 @@ import com.mooctest.domainObject.SuperParagraph;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 @Data
 public class DocParagraph extends SuperParagraph implements Serializable {
 //    private int lvl;
-    private int llvl;
-    private int linfo;
+//    private int llvl;
+//    private int linfo;
 //    private int FontSize;
 //    private String FontName;
 
@@ -34,20 +33,7 @@ public class DocParagraph extends SuperParagraph implements Serializable {
 //    private XWPFParagraph xwpfParagraph = null;
 
 
-    public DocParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId, int llvl, int linfo, String lineSpacing, int fontAlignment, int underline, String justification, boolean tableRowEnd) {
-        super(paragraphText, lvl, fontSize, fontName, asciiFontName, eastAsiaFontName, bold, italic, highlighted, strike, inTable, paragraphID, indentBeforeText, indentAfterText, firstLineIndent, lineSpace, color, rowspan, colspan, numFmt, numLevelText, numIlvl, numId);
-        this.llvl = llvl;
-        this.linfo = linfo;
-        this.lineSpacing = lineSpacing;
-        this.fontAlignment = fontAlignment;
-        this.underline = underline;
-        this.justification = justification;
-        this.tableRowEnd = tableRowEnd;
-    }
-
-    public DocParagraph(int llvl, int linfo, String lineSpacing, int fontAlignment, int underline, String justification, boolean tableRowEnd) {
-        this.llvl = llvl;
-        this.linfo = linfo;
+    public DocParagraph(String lineSpacing, int fontAlignment, int underline, String justification, boolean tableRowEnd) {
         this.lineSpacing = lineSpacing;
         this.fontAlignment = fontAlignment;
         this.underline = underline;
@@ -59,21 +45,6 @@ public class DocParagraph extends SuperParagraph implements Serializable {
 
     }
 
-    public int getLlvl() {
-        return llvl;
-    }
-
-    public void setLlvl(int llvl) {
-        this.llvl = llvl;
-    }
-
-    public int getLinfo() {
-        return linfo;
-    }
-
-    public void setLinfo(int linfo) {
-        this.linfo = linfo;
-    }
 
     public String getLineSpacing() {
         return lineSpacing;

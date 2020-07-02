@@ -1,7 +1,6 @@
 package com.mooctest.domainObject;
 
 import lombok.Data;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -14,6 +13,8 @@ import java.math.BigInteger;
 public class SuperParagraph implements Serializable {
     private String paragraphText = null;
     private int lvl;    // 大纲级别
+    private int llvl;
+    private int linfo;
     private int fontSize;
     private String fontName = "宋体";
     private String asciiFontName = "";
@@ -48,9 +49,12 @@ public class SuperParagraph implements Serializable {
 //    private ParagraphAlignment alignment = ParagraphAlignment.BOTH; // 段落对齐方式
 //    private UnderlinePatterns underline = UnderlinePatterns.NONE;   // 是否存在下划线
 
-    public SuperParagraph(String paragraphText, int lvl, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId) {
+
+    public SuperParagraph(String paragraphText, int lvl, int llvl, int linfo, int fontSize, String fontName, String asciiFontName, String eastAsiaFontName, boolean bold, boolean italic, boolean highlighted, boolean strike, boolean inTable, int paragraphID, double indentBeforeText, double indentAfterText, double firstLineIndent, double lineSpace, String color, int rowspan, int colspan, String numFmt, String numLevelText, BigInteger numIlvl, BigInteger numId) {
         this.paragraphText = paragraphText;
         this.lvl = lvl;
+        this.llvl = llvl;
+        this.linfo = linfo;
         this.fontSize = fontSize;
         this.fontName = fontName;
         this.asciiFontName = asciiFontName;
@@ -91,6 +95,22 @@ public class SuperParagraph implements Serializable {
 
     public void setLvl(int lvl) {
         this.lvl = lvl;
+    }
+
+    public int getLlvl() {
+        return llvl;
+    }
+
+    public void setLlvl(int llvl) {
+        this.llvl = llvl;
+    }
+
+    public int getLinfo() {
+        return linfo;
+    }
+
+    public void setLinfo(int linfo) {
+        this.linfo = linfo;
     }
 
     public int getFontSize() {

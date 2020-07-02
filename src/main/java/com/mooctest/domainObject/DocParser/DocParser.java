@@ -3,7 +3,6 @@ package com.mooctest.domainObject.DocParser;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
 import com.mooctest.data.enums.JustificationEnum;
-import com.mooctest.domainObject.DocxParser.DocxParser;
 import com.mooctest.domainObject.SuperParagraph;
 import com.mooctest.domainObject.SuperPicture;
 import com.mooctest.domainObject.SuperTable;
@@ -18,9 +17,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class DocParser implements Serializable {
@@ -32,6 +32,8 @@ public class DocParser implements Serializable {
     private List<DocPicture> docPictures = new ArrayList<DocPicture>();
     private int docTableNum = 0;
 
+    private transient int indent = 576;
+    private transient int firstLineIndex = 576;
     public DocParser(){}
 
     public DocParser(List<DocParagraph> docParagraphs, List<DocTable> docTables, List<DocPicture> docPictures, int docTableNum) {
@@ -78,10 +80,36 @@ public class DocParser implements Serializable {
     private DocParagraph processParagraph(Paragraph paragraph, int index) {
         //解析段落信息
         DocParagraph docParagraph = new DocParagraph();
-        docParagraph.setFirstLineIndent(paragraph.getFirstLineIndent());
+        // 设置文本之前缩进
+        if(paragraph.getIndentFromLeft() == -1){
+            docParagraph.setIndentBeforeText(0);
+        }else{
+            docParagraph.setIndentBeforeText((double) Math.round(paragraph.getIndentFromLeft() * 1.0 / indent * 100) / 100);
+        }
+
+        // 设置文本之后缩进
+        if(paragraph.getIndentFromRight() == -1){
+            docParagraph.setIndentAfterText(0);
+        }else{
+            docParagraph.setIndentAfterText((double) Math.round(paragraph.getIndentFromRight() * 1.0 / indent * 100) / 100);
+        }
+
+        // 设置首行缩进信息
+        if(paragraph.getFirstLineIndent() == -1){
+            docParagraph.setFirstLineIndent(0);
+        }else{
+            if(docParagraph.getIndentAfterText() == 0.0 && docParagraph.getIndentBeforeText() == 0.0){
+                docParagraph.setFirstLineIndent((double) Math.round(paragraph.getFirstLineIndent() * 1.0 / indent * 100) / 100);
+            }else{
+                docParagraph.setFirstLineIndent((double) Math.round(paragraph.getFirstLineIndent() * 1.0 / firstLineIndex * 100) / 100);
+            }
+        }
+
+
+//        docParagraph.setFirstLineIndent(paragraph.getFirstLineIndent());
         docParagraph.setFontAlignment(paragraph.getFontAlignment());
-        docParagraph.setIndentBeforeText(paragraph.getIndentFromLeft());
-        docParagraph.setIndentAfterText(paragraph.getIndentFromRight());
+//        docParagraph.setIndentBeforeText(paragraph.getIndentFromLeft());
+//        docParagraph.setIndentAfterText(paragraph.getIndentFromRight());
         docParagraph.setLvl(paragraph.getLvl());
         docParagraph.setLlvl(paragraph.getIlvl());
         docParagraph.setLinfo(paragraph.getIlfo());
@@ -95,7 +123,7 @@ public class DocParser implements Serializable {
 
         //解析字体格式等
         String fontName = "";
-        String color = "";
+        int color = 0;
         int fontSize = -1;
         boolean isBold = false;
         boolean isItalic = false;
@@ -105,6 +133,7 @@ public class DocParser implements Serializable {
         CharacterRun run = null;
         for (int i = 0; i < paragraph.numCharacterRuns(); i++) {
             run = paragraph.getCharacterRun(i);
+
             if (i == 0) {
                 fontSize = run.getFontSize();
                 fontName = run.getFontName();
@@ -113,6 +142,7 @@ public class DocParser implements Serializable {
                 highlighted = run.isHighlighted();
                 underline = run.getUnderlineCode();
                 strike = run.isStrikeThrough();
+                color = run.getColor();
             } else {
                 if (fontSize != run.getFontSize()) {
                     fontSize = -1;
@@ -129,6 +159,7 @@ public class DocParser implements Serializable {
                 if (highlighted != run.isHighlighted()) highlighted = false;
                 if (underline != run.getUnderlineCode()) underline = 0;
                 if (strike != run.isStrikeThrough()) strike = false;
+                if (color != run.getColor()) color = 0;
             }
         }
         docParagraph.setFontSize(fontSize);
@@ -138,6 +169,7 @@ public class DocParser implements Serializable {
         docParagraph.setHighlighted(highlighted);
         docParagraph.setUnderline(underline);
         docParagraph.setStrike(strike);
+        docParagraph.setColor(String.valueOf(color));
         return docParagraph;
     }
 
@@ -326,36 +358,130 @@ public class DocParser implements Serializable {
 
     public List<SuperParagraph> getAllParagraphs() {
         List<SuperParagraph> contextList = Lists.newArrayList();
-//        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-//        filter.getExcludes().add("paragraph");
-        for (DocParagraph docParagraph : this.docParagraphs) {
-            contextList.add(docParagraph);
+        Map<String, int[]> map = new HashMap<>();
+        Map<String, int[]> mapO = new HashMap<>();
+        int firstNum = 0;
+        int firstNumO = 0;
+        for (DocParagraph paragraph : this.docParagraphs) {
+            if (paragraph.getLvl() < 9) {
+                if(paragraph.getLinfo() == 0){
+                    contextList.add(paragraph);
+                    continue;
+                }else{
+                    if(!map.containsKey(paragraph.getLlvl()+""+paragraph.getLinfo())){
+                        map.put(paragraph.getLlvl()+""+paragraph.getLinfo(), new int[] {0,0,0,0});
+                    }
+
+                    int[] levelCurrentValues = map.get(paragraph.getLlvl()+""+paragraph.getLinfo());
+                    String titleName = paragraph.getParagraphText();
+
+                    if(paragraph.getLlvl() == 0){
+                        firstNum += 1;
+                    }
+                    String levelText = firstNum+".";
+                    levelCurrentValues[paragraph.getLlvl()] += 1;
+                    for(int i = 1; i <= paragraph.getLlvl(); i++){
+                        if(levelCurrentValues[i] == 0){
+                            levelCurrentValues[i] += 1;
+                        }
+                        levelText += levelCurrentValues[i] + ".";
+                    }
+                    paragraph.setParagraphText(levelText + titleName);
+                    map.put(paragraph.getLlvl()+""+paragraph.getLinfo(), levelCurrentValues);
+                    contextList.add(paragraph);
+                }
+
+            }else{
+                if (paragraph.getLinfo() > 0){
+                    if(!mapO.containsKey(paragraph.getLlvl()+""+paragraph.getLinfo())){
+                        mapO.put(paragraph.getLlvl()+""+paragraph.getLinfo(), new int[] {0,0,0,0});
+                    }
+
+                    int[] levelCurrentValues = mapO.get(paragraph.getLlvl()+""+paragraph.getLinfo());
+                    String titleName = paragraph.getParagraphText();
+
+                    if(paragraph.getLlvl() == 0){
+                        firstNumO += 1;
+                    }
+                    String levelText = firstNumO+".";
+                    levelCurrentValues[paragraph.getLlvl()] += 1;
+                    for(int i = 1; i <= paragraph.getLlvl(); i++){
+                        if(levelCurrentValues[i] == 0){
+                            levelCurrentValues[i] += 1;
+                        }
+                        levelText += levelCurrentValues[i] + ".";
+                    }
+                    paragraph.setParagraphText(levelText + titleName);
+                    mapO.put(paragraph.getLlvl()+""+paragraph.getLinfo(), levelCurrentValues);
+                    contextList.add(paragraph);
+                }else{
+                    contextList.add(paragraph);
+                }
+            }
         }
         return contextList;
     }
 
     public List<SuperParagraph> getAllHeads() {
         List<SuperParagraph> headList = Lists.newArrayList();
-//        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-//        filter.getExcludes().add("paragraph");
 
-        int[] levelCurrentValues = new int[] {0,0,0,0};
+        Map<String, int[]> map = new HashMap<>();
+        Map<String, int[]> mapO = new HashMap<>();
+        int firstNum = 0;
+        int firstNumO = 0;
         for (DocParagraph paragraph : this.docParagraphs) {
             if (paragraph.getLvl() < 9) {
-                headList.add(paragraph);
-            }
-            if (paragraph.getNumFmt() != null){
-                String levelText = paragraph.getNumLevelText();
-                BigInteger levelDepth = paragraph.getNumIlvl();
-                if(levelText!=null) {
-                    levelCurrentValues[levelDepth.intValue()] += 1;
-                    levelText = levelText.replace("%1", "" + levelCurrentValues[0]);
-                    levelText = levelText.replace("%2", "" + levelCurrentValues[1]);
-                    levelText = levelText.replace("%3", "" + levelCurrentValues[2]);
-                    levelText = levelText.replace("%4", "" + levelCurrentValues[3]);
-                    paragraph.setNumLevelText(levelText);
+                if(paragraph.getLinfo() == 0){
+                    headList.add(paragraph);
+                    continue;
+                }else{
+                    if(!map.containsKey(paragraph.getLlvl()+""+paragraph.getLinfo())){
+                        map.put(paragraph.getLlvl()+""+paragraph.getLinfo(), new int[] {0,0,0,0});
+                    }
+
+                    int[] levelCurrentValues = map.get(paragraph.getLlvl()+""+paragraph.getLinfo());
+                    String titleName = paragraph.getParagraphText();
+
+                    if(paragraph.getLlvl() == 0){
+                        firstNum += 1;
+                    }
+                    String levelText = firstNum+".";
+                    levelCurrentValues[paragraph.getLlvl()] += 1;
+                    for(int i = 1; i <= paragraph.getLlvl(); i++){
+                        if(levelCurrentValues[i] == 0){
+                            levelCurrentValues[i] += 1;
+                        }
+                        levelText += levelCurrentValues[i] + ".";
+                    }
+                    paragraph.setParagraphText(levelText + titleName);
+                    map.put(paragraph.getLlvl()+""+paragraph.getLinfo(), levelCurrentValues);
+                    headList.add(paragraph);
                 }
-                headList.add(paragraph);
+
+            }else{
+                if (paragraph.getLinfo() > 0){
+                    if(!mapO.containsKey(paragraph.getLlvl()+""+paragraph.getLinfo())){
+                        mapO.put(paragraph.getLlvl()+""+paragraph.getLinfo(), new int[] {0,0,0,0});
+                    }
+
+                    int[] levelCurrentValues = mapO.get(paragraph.getLlvl()+""+paragraph.getLinfo());
+                    String titleName = paragraph.getParagraphText();
+
+                    if(paragraph.getLlvl() == 0){
+                        firstNumO += 1;
+                    }
+                    String levelText = firstNumO+".";
+                    levelCurrentValues[paragraph.getLlvl()] += 1;
+                    for(int i = 1; i <= paragraph.getLlvl(); i++){
+                        if(levelCurrentValues[i] == 0){
+                            levelCurrentValues[i] += 1;
+                        }
+                        levelText += levelCurrentValues[i] + ".";
+                    }
+                    paragraph.setParagraphText(levelText + titleName);
+                    mapO.put(paragraph.getLlvl()+""+paragraph.getLinfo(), levelCurrentValues);
+                    headList.add(paragraph);
+                }
             }
         }
         return headList;
