@@ -183,7 +183,8 @@ public class WordParser implements Serializable {
     }
 
     public List<SuperParagraph> getAllHeads() {
-        return this.ext == null ? null : this.fileType.equals(".doc") ? this.docParser.getAllHeads() : this.docxParser.getAllHeads();
+        return this.ext == null ? null : this.fileType.equals(".doc") ? this.docParser.getAllHeads() : this.fileType.equals(".docx") ?
+                this.docxParser.getAllHeads() : this.pdfParser.getAllHeads();
     }
 
     public List<SuperPicture> getAllPictures() {

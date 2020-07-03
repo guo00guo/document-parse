@@ -379,11 +379,6 @@ public class PdfParser implements Serializable {
     // 获取所有图片
     public List<SuperPicture> getAllPictures() {
         List<SuperPicture> superPictureList = Lists.newArrayList();
-//        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-//        filter.getExcludes().add("PdfPictures");
-//        for (PdfPicture pdfPicture : this.pdfPictures) {
-//            pictureList.add(JSON.toJSONString(pdfPicture, filter));
-//        }
         for (PdfPicture pdfPicture : this.pdfPictures) {
             superPictureList.add(pdfPicture);
         }
@@ -393,10 +388,16 @@ public class PdfParser implements Serializable {
     // 获取所有表
     public List<SuperTable> getAllTables() {
         List<SuperTable> contextList = Lists.newArrayList();
-//        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-//        filter.getExcludes().add("XWPFParagraph");
         for (PdfTable docxTable : this.pdfTables) {
             contextList.add(docxTable);
+        }
+        return contextList;
+    }
+
+    public List<SuperParagraph> getAllHeads(){
+        List<SuperParagraph> contextList = Lists.newArrayList();
+        for (PdfParagraph pdfParagraph : this.pdfParagraphs) {
+            contextList.add(pdfParagraph);
         }
         return contextList;
     }

@@ -90,9 +90,9 @@ public class ParserServiceImpl implements ParserService {
     @Override
     public List<SuperParagraph> getAllTitle(String token){
         WordParser wordParser = getResultBean(token);
-        if(token.startsWith("pdf")){
-            throw new HttpBadRequestException("暂不支持pdf的标题获取！");
-        }
+//        if(token.startsWith("pdf")){
+//            throw new HttpBadRequestException("暂不支持pdf的标题获取！");
+//        }
 //        List<SuperTitle> allHeads = wordParser.getAllHeads().stream().map(para -> StyleWrapper.wrapperTitle(para)).collect(Collectors.toList());
         List<SuperParagraph> allHeads = wordParser.getAllHeads();
         return allHeads;
